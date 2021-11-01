@@ -56,26 +56,26 @@ def least_square_GD(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     for n_iter in range(max_iters):
         grad=compute_gradient(y,tx,w)
-        w=w-gamma*grad
         loss=compute_mse(y,tx,w)
+        w=w-gamma*grad
    
 
     return w, loss
 
 
-def least_squares_SGD(y, tx, initial_w, batch_size, max_iters, gamma):
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     """Stochastic gradient descent algorithm."""
     ws=[initial_w]
     losses=[]
     w=initial_w
     for n_iter in range(max_iters):
-      for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
+      for minibatch_y, minibatch_tx in batch_iter(y, tx, 1, num_batches=1, shuffle=True):
         loss=compute_mse(y,tx, w)
         stoch_grad=compute_gradient(minibatch_y,minibatch_tx,w)
         w=w-gamma*stoch_grad
         ws.append(w)
         losses.append(loss)
-    return losses[-1], ws[-1] #return all the ws computed by the gradient and not only the final one
+    return ws[-1], losses[-1] 
 
 
 
@@ -99,7 +99,7 @@ def ridge_regression(y, tx, lambda_):
   lambda_prime = 2*N*lambda_
   G=np.transpose(tx).dot(tx) + lambda_prime*np.eye(tx.shape[1])
   w = np.linalg.solve(G, np.transpose(tx).dot(y))
-  loss= compute_mse(y,tx,w)  #lambda_*((np.linalg.norm(w))**2)
+  loss= compute_mse(y,tx,w)  + lambda_*((np.linalg.norm(w))**2)
   return w, loss
 
 
@@ -132,8 +132,7 @@ def learning_by_gradient_descent(y, tx, w, gamma):
     return loss, w
 
 
-def logistic_regression_gradient_descent(y, tx, initial_w, max_iters, gamma):
-    threshold = 1e-8 #we need to find the right threshold
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
     losses = [] ##do we want to store the losses?
     w = initial_w
 
@@ -141,35 +140,30 @@ def logistic_regression_gradient_descent(y, tx, initial_w, max_iters, gamma):
     for iter in range(max_iters):
         # get loss and update w
         loss, w = learning_by_gradient_descent(y, tx, w, gamma)
-        # log info
-        if iter % 100 == 0:
-            print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
-        # converge criterion
         losses.append(loss)
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            break
+       
     return w, loss
 
 
-def hessian(y,tx,w):
-    pred = logistic_function(tx.dot(w))
-    pred = np.diag(pred.T[0])
-    S= np.multiply(pred, (1-pred))
-    return tx.T.dot(S).dot(tx)
+# def hessian(y,tx,w):
+#     pred = logistic_function(tx.dot(w))
+#     pred = np.diag(pred.T[0])
+#     S= np.multiply(pred, (1-pred))
+#     return tx.T.dot(S).dot(tx)
 
     
-def logistic_regression(y,tx,w):
-    loss=calculate_loss(y,tx,w) 
-    grad= calculate_gradient(y,tx,w)
-    H = calculate_hessian(y,tx,w)
-    return loss, grad, H
+# def logistic_regression(y,tx,w):
+#     loss=calculate_loss(y,tx,w) 
+#     grad= calculate_gradient(y,tx,w)
+#     H = calculate_hessian(y,tx,w)
+#     return loss, grad, H
 
 
 
 def penalized_logistic_regression(y, tx, w, lambda_):
     """return the loss, gradient"""
     # ***************************************************
-    loss=calculate_loss(y,tx,w) # lambda_*((np.linalg.norm(w))**2) right?
+    loss=calculate_loss(y,tx,w) + lambda_*((np.linalg.norm(w))**2) 
     grad= calculate_gradient(y, tx, w) + 2*lambda_*w
     return loss, grad
 def learning_by_penalized_gradient(y, tx, w, gamma, lambda_):
@@ -182,8 +176,8 @@ def learning_by_penalized_gradient(y, tx, w, gamma, lambda_):
     w =w -grad*gamma   
     return loss, w
 
-def reg_logistic_regression_GD(y, tx, lambda_, initial_w, max_iters, gamma):
-  threshold = 1e-8
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+  
   losses = []
   w=initial_w
   # start the logistic regression
@@ -192,8 +186,6 @@ def reg_logistic_regression_GD(y, tx, lambda_, initial_w, max_iters, gamma):
     loss, w = learning_by_penalized_gradient(y, tx, w, gamma, lambda_)
     losses.append(loss)
   
-    if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-      break
   return w, losses[-1]
 
 
