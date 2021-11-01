@@ -109,6 +109,8 @@ def logistic_function(x):
 def calculate_loss(y, tx, w):
   """compute the loss: negative log likelihood."""
   prediction = logistic_function(tx@w) 
+
+  ####log of 0 does not exist
   prediction[prediction == 0]= 0.0000000000001
   prediction[prediction == 1]= 0.9999999999999  
   loss_per_prediction = y*np.log(prediction) + (1-y)*np.log(1-prediction)
