@@ -88,7 +88,7 @@ def least_squares(y, tx):
     target = tx.T@y
     x_t_x = tx.T@tx
     w = np.linalg.solve(x_t_x,target)
-    return w, compute_mse(y, tx, w) #compute mse and not rmse right?
+    return w, compute_mse(y, tx, w)
 
 
 
@@ -133,7 +133,7 @@ def learning_by_gradient_descent(y, tx, w, gamma):
 
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
-    losses = [] ##do we want to store the losses?
+    losses = [] 
     w = initial_w
 
     # start the logistic regression
@@ -144,19 +144,6 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
        
     return w, loss
 
-
-# def hessian(y,tx,w):
-#     pred = logistic_function(tx.dot(w))
-#     pred = np.diag(pred.T[0])
-#     S= np.multiply(pred, (1-pred))
-#     return tx.T.dot(S).dot(tx)
-
-    
-# def logistic_regression(y,tx,w):
-#     loss=calculate_loss(y,tx,w) 
-#     grad= calculate_gradient(y,tx,w)
-#     H = calculate_hessian(y,tx,w)
-#     return loss, grad, H
 
 
 
